@@ -1,0 +1,11 @@
+g# Frontend (React/Vite/Next)
+node_modules/
+dist/
+.env
+
+# Backend (Python/FastAPI)
+__pycache__/
+*.pyc
+venv/
+.venv
+.env
