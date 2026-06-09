@@ -79,16 +79,17 @@ function App() {
   }, [isEditing, currentIndex, history, status, mode, maxSubStep]);
 
   const handlePrev = useCallback(() => {
-    if (isEditing || currentIndex <= 0) return;
+  if (isEditing || currentIndex < 0) return; // Modification légère de la borne pour plus de sécurité
 
-    // Gestion du retour en arrière sur la sous-étape en mode MAX
-    if (mode === 'max' && currentIndex === 0 && maxSubStep === 1) {
-      setMaxSubStep(0);
-      return;
-    }
+  if (mode === 'max' && currentIndex === 0 && maxSubStep === 1) {
+    setMaxSubStep(0);
+    return;
+  }
 
-    currentIndex = currentIndex - 1;
-  }, [isEditing, currentIndex, mode, maxSubStep]);
+  if (currentIndex > 0) {
+    setCurrentIndex(currentIndex - 1); //  Déclenche correctement le re-render
+  }
+}, [isEditing, currentIndex, mode, maxSubStep]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
@@ -549,12 +550,21 @@ function App() {
           })()}
 
           {/* BORNE GLOBALE B */}
-          {status?.step === 1 && maxSubStep === 1 && status?.col_minimums && status?.B_bound !== undefined && (
-            <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-xs font-mono tracking-wide uppercase flex items-center gap-2.5 shadow-sm">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-              Borne Initiale Globale B : <span className="font-bold text-sm bg-white border border-emerald-200 px-2 py-0.5 rounded text-emerald-700">{status.B_bound}</span>
-            </div>
-          )}
+          {status?.step === 1 && status?.col_minimums && status?.B_bound !== undefined && (
+  (() => {
+    // En mode max, on attend la sous-étape B. En mode min, on l'affiche dès que les min. colonnes sont là.
+    const showBound = mode === 'min' || (mode === 'max' && maxSubStep === 1);
+    
+    if (!showBound) return null;
+
+    return (
+      <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-xs font-mono tracking-wide uppercase flex items-center gap-2.5 shadow-sm animate-fade-in">
+        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+        Borne Initiale Globale B : <span className="font-bold text-sm bg-white border border-emerald-200 px-2 py-0.5 rounded text-emerald-700">{status.B_bound}</span>
+      </div>
+    );
+  })()
+)}
 
           {/* VISUALISATION DU PIVOT */}
           {status?.step === 4 && status?.pivot_m !== undefined && (
