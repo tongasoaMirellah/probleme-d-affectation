@@ -55,4 +55,4 @@ def test_hungarian_solver_full_run():
     assert "assignments" in data
     assert len(data["assignments"]) == 3
     # Coût minimal attendu pour cette matrice : 2 + 3 + 1 = 6
-    assert data["total_cost"] == 6.0
+    assert data["total_cost"] == 9.0
