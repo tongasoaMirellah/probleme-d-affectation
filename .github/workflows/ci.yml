@@ -1,0 +1,49 @@
+name: CI Pipeline
+
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 
+      - name: Installer Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 
+        with:
+          python-version: '3.12'
+
+      - name: Installer les dépendances Backend
+        run: pip install -r backend/requirements.txt
+
+      - name: Lancer les tests Backend
+        run: |
+          pip install pytest
+          pytest backend/
+
+  test-frontend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 
+
+      - name: Installer Node.js
+        uses: actions/setup-node@0a44ba78417256138a22146f3dd6102129c78278
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Installer les dépendances Frontend
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lancer les tests Frontend (Vite / Vitest)
+        working-directory: ./frontend
+        run: npm run test -- --run
