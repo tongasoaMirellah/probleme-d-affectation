@@ -25,7 +25,7 @@ jobs:
 
       - name: Lancer les tests Backend
         run: |
-          pip install pytest
+          pip install pytest httpx
           pytest backend/
 
   test-frontend:
